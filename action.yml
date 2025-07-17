@@ -147,7 +147,7 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
         CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.anthropic_api_key == 'use-oauth' && steps.extract-oauth-token.outputs.oauth_token || '' }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
