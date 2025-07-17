@@ -91,6 +91,20 @@ runs:
         cd ${{ github.action_path }}
         bun install
 
+    - name: Extract OAuth token
+      id: extract-oauth-token
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
+      shell: bash
+      run: |
+        if [ -f "$HOME/.claude/.credentials.json" ]; then
+          OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
+          echo "::add-mask::$OAUTH_TOKEN"
+          echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
+          echo "OAuth token extracted successfully"
+        else
+          echo "OAuth credentials file not found"
+        fi
+
     - name: Prepare action
       id: prepare
       shell: bash
@@ -123,7 +137,8 @@ runs:
         mcp_config: ${{ steps.prepare.outputs.mcp_config }}
         use_bedrock: ${{ inputs.use_bedrock }}
         use_vertex: ${{ inputs.use_vertex }}
-        anthropic_api_key: ${{ inputs.anthropic_api_key }}
+        anthropic_api_key: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
+        claude_code_oauth_token: ${{ steps.extract-oauth-token.outputs.oauth_token || '' }}
       env:
         # Core configuration
         PROMPT_FILE: /tmp/claude-prompts/claude-prompt.txt
