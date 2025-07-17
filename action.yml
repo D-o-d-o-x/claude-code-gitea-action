@@ -110,6 +110,12 @@ runs:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
+    - name: Unset API key for OAuth
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
+      shell: bash
+      run: |
+        echo "ANTHROPIC_API_KEY=" >> $GITHUB_ENV
+
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
@@ -135,7 +141,7 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
         # GitHub token for repository access
