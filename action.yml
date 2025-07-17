@@ -91,20 +91,6 @@ runs:
         cd ${{ github.action_path }}
         bun install
 
-    - name: Extract OAuth token
-      id: extract-oauth-token
-      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
-      shell: bash
-      run: |
-        if [ -f "$HOME/.claude/.credentials.json" ]; then
-          OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
-          echo "::add-mask::$OAUTH_TOKEN"
-          echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
-          echo "OAuth token extracted successfully"
-        else
-          echo "OAuth credentials file not found"
-        fi
-
     - name: Prepare action
       id: prepare
       shell: bash
@@ -124,10 +110,24 @@ runs:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
+    - name: Extract OAuth token
+      id: extract-oauth-token
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
+      shell: bash
+      run: |
+        if [ -f "$HOME/.claude/.credentials.json" ]; then
+          OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
+          echo "::add-mask::$OAUTH_TOKEN"
+          echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
+          echo "OAuth token extracted successfully"
+        else
+          echo "OAuth credentials file not found"
+        fi
+
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
-      uses: anthropics/claude-code-base-action@v0.0.24
+      uses: anthropics/claude-code-base-action@main
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
         allowed_tools: ${{ env.ALLOWED_TOOLS }}
@@ -150,7 +150,6 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
         # GitHub token for repository access
