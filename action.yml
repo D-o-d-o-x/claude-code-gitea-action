@@ -127,7 +127,7 @@ runs:
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
-      uses: anthropics/claude-code-base-action@main
+      uses: anthropics/claude-code-base-action@v0.0.24
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
         allowed_tools: ${{ env.ALLOWED_TOOLS }}
@@ -137,7 +137,7 @@ runs:
         mcp_config: ${{ steps.prepare.outputs.mcp_config }}
         use_bedrock: ${{ inputs.use_bedrock }}
         use_vertex: ${{ inputs.use_vertex }}
-        anthropic_api_key: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
+        anthropic_api_key: ${{ inputs.anthropic_api_key == 'use-oauth' && '' || inputs.anthropic_api_key }}
         claude_code_oauth_token: ${{ steps.extract-oauth-token.outputs.oauth_token || '' }}
       env:
         # Core configuration
@@ -159,6 +159,9 @@ runs:
         # Git configuration
         CLAUDE_GIT_NAME: ${{ inputs.claude_git_name }}
         CLAUDE_GIT_EMAIL: ${{ inputs.claude_git_email }}
+
+        # API Key (only when NOT using OAuth)
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
 
         # Provider configuration (for future cloud provider support)
         ANTHROPIC_BASE_URL: ${{ env.ANTHROPIC_BASE_URL }}
