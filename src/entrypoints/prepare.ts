@@ -28,9 +28,6 @@ async function run() {
 
     if (claudeCredentials && anthropicApiKey === "use-oauth") {
       await setupOAuthCredentials(claudeCredentials);
-      console.log(
-        "OAuth credentials configured for Claude AI Max subscription",
-      );
     }
 
     // Step 2: Setup GitHub token
@@ -59,7 +56,6 @@ async function run() {
     core.setOutput("GITHUB_TOKEN", githubToken);
 
     if (!containsTrigger) {
-      console.log("No trigger found, skipping remaining steps");
       return;
     }
 

@@ -110,25 +110,20 @@ runs:
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
-    - name: Extract OAuth token and unset API key
+    - name: Extract OAuth token
       id: extract-oauth-token
       if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
       shell: bash
       run: |
         if [ -f "$HOME/.claude/.credentials.json" ]; then
-          OAUTH_TOKEN=$(node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('$HOME/.claude/.credentials.json', 'utf8')); console.log(data.claudeAiOauth.accessToken);")
+          OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
           echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
-        else
-          echo "oauth_token=oauth-configured" >> $GITHUB_OUTPUT
         fi
-        # Unset ANTHROPIC_API_KEY for OAuth so CLI falls back to credentials file
-        echo "ANTHROPIC_API_KEY=" >> $GITHUB_ENV
-        unset ANTHROPIC_API_KEY
 
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
-      uses: D-o-d-o-x/claude-code-base-action@main
+      uses: anthropics/claude-code-base-action@main
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
         allowed_tools: ${{ env.ALLOWED_TOOLS }}
@@ -150,7 +145,7 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.anthropic_api_key == 'use-oauth' && steps.extract-oauth-token.outputs.oauth_token || '' }}
+        CLAUDE_CODE_OAUTH_TOKEN: ${{ steps.extract-oauth-token.outputs.oauth_token || '' }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
         # GitHub token for repository access
