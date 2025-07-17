@@ -128,7 +128,7 @@ runs:
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
-      uses: anthropics/claude-code-base-action@v0.0.24
+      uses: D-o-d-o-x/claude-code-base-action@main
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
         allowed_tools: ${{ env.ALLOWED_TOOLS }}
@@ -138,7 +138,7 @@ runs:
         mcp_config: ${{ steps.prepare.outputs.mcp_config }}
         use_bedrock: ${{ inputs.use_bedrock }}
         use_vertex: ${{ inputs.use_vertex }}
-        anthropic_api_key: ${{ inputs.anthropic_api_key }}
+        anthropic_api_key: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
       env:
         # Core configuration
         PROMPT_FILE: /tmp/claude-prompts/claude-prompt.txt
@@ -150,7 +150,6 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
         CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.anthropic_api_key == 'use-oauth' && steps.extract-oauth-token.outputs.oauth_token || '' }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
