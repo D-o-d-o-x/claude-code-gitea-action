@@ -117,7 +117,11 @@ runs:
       run: |
         if [ -f "$HOME/.claude/.credentials.json" ]; then
           OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
+          echo "::add-mask::$OAUTH_TOKEN"
           echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
+          echo "OAuth token extracted successfully"
+        else
+          echo "OAuth credentials file not found"
         fi
 
     - name: Run Claude Code
@@ -134,6 +138,7 @@ runs:
         use_bedrock: ${{ inputs.use_bedrock }}
         use_vertex: ${{ inputs.use_vertex }}
         anthropic_api_key: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
+        claude_code_oauth_token: ${{ steps.extract-oauth-token.outputs.oauth_token || '' }}
       env:
         # Core configuration
         PROMPT_FILE: /tmp/claude-prompts/claude-prompt.txt
@@ -145,7 +150,6 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        CLAUDE_CODE_OAUTH_TOKEN: ${{ steps.extract-oauth-token.outputs.oauth_token || '' }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
         # GitHub token for repository access
