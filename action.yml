@@ -123,7 +123,7 @@ runs:
         mcp_config: ${{ steps.prepare.outputs.mcp_config }}
         use_bedrock: ${{ inputs.use_bedrock }}
         use_vertex: ${{ inputs.use_vertex }}
-        anthropic_api_key: ${{ inputs.anthropic_api_key }}
+        anthropic_api_key: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
       env:
         # Core configuration
         PROMPT_FILE: /tmp/claude-prompts/claude-prompt.txt
@@ -135,7 +135,7 @@ runs:
         MCP_CONFIG: ${{ steps.prepare.outputs.mcp_config }}
         USE_BEDROCK: ${{ inputs.use_bedrock }}
         USE_VERTEX: ${{ inputs.use_vertex }}
-        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key != 'use-oauth' && inputs.anthropic_api_key || '' }}
         CLAUDE_CREDENTIALS: ${{ inputs.claude_credentials }}
 
         # GitHub token for repository access
