@@ -116,7 +116,7 @@ runs:
       shell: bash
       run: |
         if [ -f "$HOME/.claude/.credentials.json" ]; then
-          OAUTH_TOKEN=$(jq -r '.claudeAiOauth.accessToken' "$HOME/.claude/.credentials.json")
+          OAUTH_TOKEN=$(node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('$HOME/.claude/.credentials.json', 'utf8')); console.log(data.claudeAiOauth.accessToken);")
           echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
         else
           echo "oauth_token=oauth-configured" >> $GITHUB_OUTPUT
