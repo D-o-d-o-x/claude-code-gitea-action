@@ -115,13 +115,14 @@ runs:
       if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
       shell: bash
       run: |
-        if [ -f "$HOME/.claude/.credentials.json" ]; then
-          OAUTH_TOKEN=$(node -pe "JSON.parse(require('fs').readFileSync('$HOME/.claude/.credentials.json', 'utf8')).claudeAiOauth.accessToken")
+        if [ -n "${{ secrets.CLAUDE_CREDENTIALS }}" ]; then
+          OAUTH_TOKEN=$(echo "${{ secrets.CLAUDE_CREDENTIALS }}" | base64 -d | jq -r '.claudeAiOauth.accessToken')
           echo "::add-mask::$OAUTH_TOKEN"
           echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
-          echo "OAuth token extracted successfully"
+          echo "OAuth token extracted successfully from secrets.CLAUDE_CREDENTIALS"
         else
-          echo "OAuth credentials file not found"
+          echo "CLAUDE_CREDENTIALS secret not found"
+          exit 1
         fi
 
     - name: Run Claude Code
