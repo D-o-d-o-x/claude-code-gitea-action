@@ -22,16 +22,7 @@ import { setupOAuthCredentials } from "../claude/oauth-setup";
 
 async function run() {
   try {
-    // Step 1: Setup OAuth credentials if provided
-    const claudeCredentials = process.env.CLAUDE_CREDENTIALS;
-    const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
-
-    if (claudeCredentials && anthropicApiKey === "use-oauth") {
-      await setupOAuthCredentials(claudeCredentials);
-      console.log(
-        "OAuth credentials configured for Claude AI Max subscription",
-      );
-    }
+    // Note: OAuth credentials are handled directly in action.yml, no file creation needed
 
     // Step 2: Setup GitHub token
     const githubToken = await setupGitHubToken();
