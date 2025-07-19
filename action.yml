@@ -115,13 +115,13 @@ runs:
       if: steps.prepare.outputs.contains_trigger == 'true' && inputs.anthropic_api_key == 'use-oauth'
       shell: bash
       run: |
-        if [ -n "${{ secrets.CLAUDE_CREDENTIALS }}" ]; then
-          OAUTH_TOKEN=$(echo "${{ secrets.CLAUDE_CREDENTIALS }}" | base64 -d | jq -r '.claudeAiOauth.accessToken')
+        if [ -n "${{ inputs.claude_credentials }}" ]; then
+          OAUTH_TOKEN=$(echo "${{ inputs.claude_credentials }}" | base64 -d | jq -r '.claudeAiOauth.accessToken')
           echo "::add-mask::$OAUTH_TOKEN"
           echo "oauth_token=$OAUTH_TOKEN" >> $GITHUB_OUTPUT
-          echo "OAuth token extracted successfully from secrets.CLAUDE_CREDENTIALS"
+          echo "OAuth token extracted successfully from inputs.claude_credentials"
         else
-          echo "CLAUDE_CREDENTIALS secret not found"
+          echo "CLAUDE_CREDENTIALS input not found"
           exit 1
         fi
 
