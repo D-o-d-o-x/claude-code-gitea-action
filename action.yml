@@ -196,6 +196,7 @@ runs:
       uses: anthropics/claude-code-base-action@beta
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
+        path_to_claude_code_executable: ${{ inputs.path_to_claude_code_executable }}
         allowed_tools: ${{ env.ALLOWED_TOOLS }}
         disallowed_tools: ${{ env.DISALLOWED_TOOLS }}
         max_turns: ${{ inputs.max_turns }}
