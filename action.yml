@@ -193,7 +193,7 @@ runs:
     - name: Run Claude Code
       id: claude-code
       if: steps.prepare.outputs.contains_trigger == 'true'
-      uses: anthropics/claude-code-base-action@beta
+      uses: anthropics/claude-code-base-action@main
       with:
         prompt_file: /tmp/claude-prompts/claude-prompt.txt
         path_to_claude_code_executable: ${{ inputs.path_to_claude_code_executable }}
